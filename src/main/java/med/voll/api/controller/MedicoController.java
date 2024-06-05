@@ -28,7 +28,7 @@ public class MedicoController {
     public Page<DadosListaMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable pageable) {
         //Page gera os dados de paginação para o front-end, usado junto com o Pageable,
         //cuidar ao selecionar, para pegar o do spring
-        return repository.findAll(pageable)
+        return repository.findAllByAtivoTrue(pageable)
                 .map(DadosListaMedico::new);
 
         //esse método já tem um "stream" e gera um "tolist", itens que seriam adicionados
@@ -46,10 +46,21 @@ public class MedicoController {
         medico.atualizarInformacoes(dados);
     }
 
+    //deleta diretamente no banco
+//    @DeleteMapping("/{id}")
+//    @Transactional
+//    public void excluir(@PathVariable Long id) {
+//        repository.deleteById(id);
+//    }
+
+
+    //dessa forma ele marca o item como "inativo" em vez de remover o
+    //item do banco
     @DeleteMapping("/{id}")
     @Transactional
     public void excluir(@PathVariable Long id) {
-        repository.deleteById(id);
+        var medico = repository.getReferenceById(id);
+        medico.excluir();
     }
 }
 
